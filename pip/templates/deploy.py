@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -19,6 +19,7 @@
 # under the License.
 #
 import argparse
+import configparser
 import glob
 import os
 import shutil
@@ -53,10 +54,15 @@ if repo_type_key not in properties:
 
 pip_registry = properties[repo_type_key]
 
-pip_username, pip_password = (
-    os.getenv('DEPLOY_PIP_USERNAME'),
-    os.getenv('DEPLOY_PIP_PASSWORD'),
-)
+
+pypirc = os.path.expanduser("~/.pypirc")
+if not os.path.exists(pypirc):
+    raise Exception("~/.pypirc not found")
+
+config = configparser.ConfigParser()
+config.read(pypirc)
+pip_username, pip_password = config["pypi"]["username"], config["pypi"]["password"]
+
 
 if not pip_username:
     raise Exception(
